@@ -1,19 +1,20 @@
 package com.alevel.homework39.controller;
 
 import com.alevel.homework39.dto.EmployeeTrip;
-import com.alevel.homework39.service.EmployeeTripNotFoundException;
 import com.alevel.homework39.service.EmployeeTripService;
-import com.alevel.homework39.service.TripCost;
+import com.alevel.homework39.service.TripCostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Controller
+
 public class MainController {
 
     private final EmployeeTripService employeeTripService;
@@ -34,18 +35,9 @@ public class MainController {
         return "greeting";
     }
 
-/*    @PostMapping("/main")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeTrip save(@RequestBody EmployeeTrip employeeTrip) {
-        Long id = employeeTripService.save(employeeTrip);
-        employeeTrip.setId(id);
-
-        return employeeTrip;
-    }*/
-
     @PostMapping("/main")
-    public String add(@RequestParam String name,
-                      @RequestParam int route,
+    public String add(@Valid @RequestParam String name,
+                      @Valid @RequestParam  int route,
                       Map<String, Object> model) {
 
         EmployeeTrip employeeTrip = new EmployeeTrip(name, route);
@@ -65,33 +57,24 @@ public class MainController {
         return "main";
     }
 
-    @GetMapping("/{id}")
-    public EmployeeTrip find(@PathVariable Long id) {
-        return employeeTripService.findById(id).
-                orElseThrow(() -> new EmployeeTripNotFoundException(id));
-
-    }
-
     @GetMapping("/value")
     public String getValue() {
         return "value";
-/*        return "<b> Fuel cost = " + fuelCost + " euro </b>" +
-                "<br><b> Fuel consumption = " + fuelConsumption +" </b></br>";*/
     }
 
     @GetMapping("/cost")
     public String getCost(Map<String, Object> model) {
 
         EmployeeTrip tripMax = employeeTripService.getMax().orElse(new EmployeeTrip());
-        TripCost tripCostMax = new TripCost();
+        TripCostService tripCostMax = new TripCostService();
         tripCostMax.setName(tripMax);
         tripCostMax.setCost(tripMax, fuelConsumption, fuelCost);
 
-        List<TripCost> tripCostList = new ArrayList<>();
+        List<TripCostService> tripCostList = new ArrayList<>();
         tripCostList.add(tripCostMax);
 
         EmployeeTrip tripMin = employeeTripService.getMin().orElse(new EmployeeTrip());
-        TripCost tripCostMin = new TripCost();
+        TripCostService tripCostMin = new TripCostService();
         tripCostMin.setName(tripMin);
         tripCostMin.setCost(tripMin, fuelConsumption, fuelCost);
 
@@ -115,15 +98,5 @@ public class MainController {
         model.put("trips", trips);
 
         return "main";
-    }
-
-    @PatchMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody EmployeeTrip employeeTrip) {
-        employeeTripService.update(id, employeeTrip);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        employeeTripService.delete(id);
     }
 }

@@ -1,6 +1,8 @@
 package com.alevel.homework39.dto;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 @Entity
@@ -10,7 +12,10 @@ public class EmployeeTrip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Name of object cannot be empty")
     private String name;
+
+    @Min(value = 0, message = "route: must be greater than or equal to 0")
     private int route; // число миль(!), которые сотрудник предприятия проехал на корпоративной машине.
 
     public EmployeeTrip() {

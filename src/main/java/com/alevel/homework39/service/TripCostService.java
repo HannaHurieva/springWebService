@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
-public class TripCost {
+public class TripCostService {
     private String name;
     private float cost;
 
-    public TripCost() {
+    public TripCostService() {
     }
 
-    public TripCost(String name, float cost) {
+    public TripCostService(String name, float cost) {
         this.name = name;
         this.cost = cost;
     }
@@ -39,7 +39,7 @@ public class TripCost {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TripCost tripCost = (TripCost) o;
+        TripCostService tripCost = (TripCostService) o;
         return Float.compare(tripCost.cost, cost) == 0 &&
                 Objects.equals(name, tripCost.name);
     }

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+
+<body>
+
+    <div>
+      <form method="post">
+        <input type="text" name="name" placeholder="Input employee name:">
+        <input type="text" name="route" placeholder="The route in miles:">
+
+        <button type="submit">To add</button>
+       </form>
+    </div>
+
+    <div>Filter by employee</div>
+    <form method="post" action="filter">
+        <input type="name" name="filter">
+
+        <button type="submit">Find</button>
+    </form>
+
+  <h2>List of trips</h2>
+  <table>
+  <tr>
+  <th>Emp Id</th>
+  <th>Emp Name</th>
+  <th>Route</th>
+  </tr>
+
+  {{#trips}}
+     <tr>
+     <td>{{id}}</td>
+     <td>{{name}}</td>
+     <td>{{route}}</td>
+     </tr>
+     {{/trips}}
+  </table>
+
+<a href="/cost">Max-Min cost of trips</a>
+
+</body>
+
+</html>

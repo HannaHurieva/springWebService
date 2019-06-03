@@ -3,15 +3,17 @@ package com.alevel.homework39.controller;
 import com.alevel.homework39.dto.EmployeeTrip;
 import com.alevel.homework39.service.EmployeeTripNotFoundException;
 import com.alevel.homework39.service.EmployeeTripService;
+import com.alevel.homework39.service.TripCost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-@RestController
-@RequestMapping("/main")
+@Controller
 public class MainController {
 
     private final EmployeeTripService employeeTripService;
@@ -27,16 +29,40 @@ public class MainController {
     @Value("${fuel.consumption}")
     private float fuelConsumption;
 
-    @GetMapping("/value")
-    public String getValue()
-    {
-        return "<b> Fuel cost = " + fuelCost + " euro </b>" +
-                "<br><b> Fuel consumption = " + fuelConsumption +" </b></br>";
+    @GetMapping("/")
+    public String greeting(Map<String, Object> model) {
+        return "greeting";
     }
 
-    @GetMapping
-    public List<EmployeeTrip> findAll() {
-        return employeeTripService.findAll();
+/*    @PostMapping("/main")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EmployeeTrip save(@RequestBody EmployeeTrip employeeTrip) {
+        Long id = employeeTripService.save(employeeTrip);
+        employeeTrip.setId(id);
+
+        return employeeTrip;
+    }*/
+
+    @PostMapping("/main")
+    public String add(@RequestParam String name,
+                      @RequestParam int route,
+                      Map<String, Object> model) {
+
+        EmployeeTrip employeeTrip = new EmployeeTrip(name, route);
+        employeeTripService.save(employeeTrip);
+
+        Iterable<EmployeeTrip> trips = employeeTripService.findAll();
+        model.put("trips", trips);
+
+        return "main";
+    }
+
+    @GetMapping("/main")
+    public String findAll(Map<String, Object> model) {
+        Iterable<EmployeeTrip> trips = employeeTripService.findAll();
+
+        model.put("trips", trips);
+        return "main";
     }
 
     @GetMapping("/{id}")
@@ -46,29 +72,49 @@ public class MainController {
 
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeTrip save(@RequestBody EmployeeTrip employeeTrip) {
-        Long id = employeeTripService.save(employeeTrip);
-        employeeTrip.setId(id);
-
-        return employeeTrip;
+    @GetMapping("/value")
+    public String getValue() {
+        return "value";
+/*        return "<b> Fuel cost = " + fuelCost + " euro </b>" +
+                "<br><b> Fuel consumption = " + fuelConsumption +" </b></br>";*/
     }
 
-
     @GetMapping("/cost")
-    public String getMaxMinCost() {
+    public String getCost(Map<String, Object> model) {
 
         EmployeeTrip tripMax = employeeTripService.getMax().orElse(new EmployeeTrip());
-        float costMax = (float) (tripMax.getRoute() * 1.609 / 100 * fuelConsumption * fuelCost );
-        String nameMax = tripMax.getName();
+        TripCost tripCostMax = new TripCost();
+        tripCostMax.setName(tripMax);
+        tripCostMax.setCost(tripMax, fuelConsumption, fuelCost);
+
+        List<TripCost> tripCostList = new ArrayList<>();
+        tripCostList.add(tripCostMax);
 
         EmployeeTrip tripMin = employeeTripService.getMin().orElse(new EmployeeTrip());
-        float costMin = (float) (tripMin.getRoute() * 1.609 / 100 * fuelConsumption * fuelCost);
-        String nameMin = tripMin.getName();
+        TripCost tripCostMin = new TripCost();
+        tripCostMin.setName(tripMin);
+        tripCostMin.setCost(tripMin, fuelConsumption, fuelCost);
 
-        return "<b> Max trip : </b>" + nameMax + "<b> cost " + costMax + " euro </b> " +
-                "<br><b> Min trip : </b>" + nameMin + "<b> cost " + costMin + " euro </b></br> ";
+        tripCostList.add(tripCostMin);
+        model.put("trips", tripCostList);
+
+        return "cost";
+    }
+
+    @PostMapping("filter")
+    public String filter(@RequestParam String filter,
+                         Map<String, Object> model) {
+        Iterable<EmployeeTrip> trips;
+
+        if (filter != null && !filter.isEmpty()) {
+            trips = employeeTripService.findByName(filter);
+        } else {
+            trips = employeeTripService.findAll();
+        }
+
+        model.put("trips", trips);
+
+        return "main";
     }
 
     @PatchMapping("/{id}")

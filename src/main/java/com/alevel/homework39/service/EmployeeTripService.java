@@ -10,7 +10,7 @@ public interface EmployeeTripService {
 
     Optional<EmployeeTrip> findById(Long id);
 
-    EmployeeTrip findByName(String name);
+    List<EmployeeTrip> findByName(String name);
 
     Optional<EmployeeTrip> getMax();
 

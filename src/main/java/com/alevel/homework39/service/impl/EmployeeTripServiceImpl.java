@@ -32,7 +32,7 @@ public final class EmployeeTripServiceImpl implements EmployeeTripService {
     }
 
     @Override
-    public EmployeeTrip findByName(String name) {
+    public List<EmployeeTrip> findByName(String name) {
         return employeeTripRepo.findByName(name);
     }
 
